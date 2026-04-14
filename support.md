@@ -1,0 +1,1 @@
+Uhh so what do i do here? im not old enough for a bank account so uhh what do i do here?

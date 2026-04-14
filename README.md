@@ -1,1 +1,1 @@
-# maBot
+This is a fork of xdBot called maBot by Mahdi, or known as MahdiAhmedMC on Geometry Dash and Github.
