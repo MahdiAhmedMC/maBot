@@ -14,7 +14,7 @@ jobs:
         config:
         - name: Windows
           os: windows-latest
-          
+
         - name: macOS
           os: macos-latest
 
@@ -39,19 +39,42 @@ jobs:
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
         with:
-          combine: true
+          sdk: "5.6.1"
+          build-config: Release
+          combine: false
           target: ${{ matrix.config.target }}
-      
+
+      - name: Upload platform build
+        uses: actions/upload-artifact@v4
+        with:
+          name: platform-builds
+          path: ${{ steps.build.outputs.build-output }}
+
   package:
     name: Package builds
     runs-on: ubuntu-latest
     needs: ['build']
 
     steps:
-      - uses: geode-sdk/build-geode-mod/combine@main
-        id: build
+      - name: Download all platform builds
+        uses: actions/download-artifact@v4
+        with:
+          name: platform-builds
+          path: builds
 
-      - uses: actions/upload-artifact@v4
+      - name: Combine builds
+        uses: geode-sdk/build-geode-mod/combine@main
+        id: combine
+        with:
+          input: builds
+
+      - name: Rename final .geode
+        run: |
+          mkdir final
+          cp "${{ steps.combine.outputs.build-output }}" "final/MahdiAhmedMC.maBot.geode"
+
+      - name: Upload final .geode
+        uses: actions/upload-artifact@v4
         with:
           name: Build Output
-          path: ${{ steps.build.outputs.build-output }}
+          path: final/MahdiAhmedMC.maBot.geode
