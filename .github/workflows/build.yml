@@ -46,10 +46,10 @@ jobs:
           target: ${{ matrix.config.target }}
 
       - name: Upload platform build
-        uses: actions/upload-artifact@v4
-        with:
-          name: platform-builds
-          path: ${{ steps.build.outputs.build-output }}
+  uses: actions/upload-artifact@v4
+  with:
+    name: ${{ matrix.config.name }}-build
+    path: ${{ steps.build.outputs.build-output }}
 
   package:
     name: Package builds
@@ -58,22 +58,21 @@ jobs:
 
     steps:
       - name: Download all platform builds
-        uses: actions/download-artifact@v4
-        with:
-          name: platform-builds
-          path: builds
-
+  uses: actions/download-artifact@v4 
+  with:
+    path: builds
+    
       - name: Combine builds
         uses: geode-sdk/build-geode-mod/combine@main
         id: combine
         with:
           input: builds
-
+          
       - name: Rename final .geode
         run: |
           mkdir final
           cp "${{ steps.combine.outputs.build-output }}" "final/MahdiAhmedMC.maBot.geode"
-
+      
       - name: Upload final .geode
         uses: actions/upload-artifact@v4
         with:
