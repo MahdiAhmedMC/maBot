@@ -91,7 +91,7 @@
         },
         "open_menu_keybind": {
             "name": "Open Menu Keybind",
-            "description": "The keybind to open the xdBot menu.",
+            "description": "The keybind to open the maBot menu.",
             "type": "keybind",
             "default": "Alt+F",
             "category": "universal"
