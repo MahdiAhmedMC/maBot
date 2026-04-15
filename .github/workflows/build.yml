@@ -6,6 +6,19 @@ on:
     tags:
       - "v*"
 
+# -------------------------
+#  SHARED STEPS (REUSABLE)
+# -------------------------
+
+# Linux/macOS SDK + CPM setup
+defaults:
+  run:
+    shell: bash
+
+# -------------------------
+#  WINDOWS JOB
+# -------------------------
+
 jobs:
   windows:
     runs-on: windows-latest
@@ -15,8 +28,15 @@ jobs:
       - name: Download Geode SDK
         run: |
           curl -L https://github.com/geode-sdk/geode/releases/latest/download/geode-sdk.zip -o geode-sdk.zip
-          unzip geode-sdk.zip -d sdk-temp
-          if (Test-Path "sdk-temp/geode-sdk") { Move-Item sdk-temp/geode-sdk geode-sdk } else { Move-Item sdk-temp geode-sdk }
+          New-Item -ItemType Directory -Path sdk-temp | Out-Null
+          Expand-Archive geode-sdk.zip -DestinationPath sdk-temp -Force
+
+          if (Test-Path "sdk-temp/geode-sdk") {
+            Move-Item sdk-temp/geode-sdk geode-sdk
+          } else {
+            Move-Item sdk-temp geode-sdk
+          }
+
           echo "GEODE_SDK=$PWD/geode-sdk" >> $env:GITHUB_ENV
 
       - name: Install CPM
@@ -35,6 +55,10 @@ jobs:
         with:
           name: windows
           path: build/maBot.dll
+
+# -------------------------
+#  MACOS JOB
+# -------------------------
 
   macos:
     runs-on: macos-latest
@@ -64,6 +88,10 @@ jobs:
         with:
           name: macos
           path: build/maBot.dylib
+
+# -------------------------
+#  IOS JOB
+# -------------------------
 
   ios:
     runs-on: macos-latest
@@ -98,6 +126,10 @@ jobs:
           name: ios
           path: build/MahdiAhmedMC.maBot.geode
 
+# -------------------------
+#  LINUX JOB
+# -------------------------
+
   linux:
     runs-on: ubuntu-latest
     steps:
@@ -129,6 +161,10 @@ jobs:
         with:
           name: linux
           path: build/maBot.so
+
+# -------------------------
+#  ANDROID JOB
+# -------------------------
 
   android:
     runs-on: ubuntu-latest
@@ -169,6 +205,10 @@ jobs:
         with:
           name: android
           path: build/maBot.so
+
+# -------------------------
+#  COMBINE JOB
+# -------------------------
 
   combine:
     needs: [windows, macos, ios, linux, android]
