@@ -1,1 +1,1 @@
-This is a fork of xdBot called maBot by Mahdi, or known as MahdiAhmedMC on Geometry Dash and Github.
+maBot is a simple macro tool designed for geometry dash using geode sdk intended for showcases.
