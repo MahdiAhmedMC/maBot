@@ -11,10 +11,19 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download Geode SDK
+        run: |
+          curl -L https://github.com/geode-sdk/geode/releases/latest/download/geode-sdk.zip -o geode-sdk.zip
+          unzip geode-sdk.zip -d geode-sdk
+          echo "GEODE_SDK=$PWD/geode-sdk" >> $GITHUB_ENV
+
       - name: Configure
         run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
       - name: Build
         run: cmake --build build --config Release
+
       - name: Upload Windows Binary
         uses: actions/upload-artifact@v4
         with:
@@ -25,10 +34,19 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download Geode SDK
+        run: |
+          curl -L https://github.com/geode-sdk/geode/releases/latest/download/geode-sdk.zip -o geode-sdk.zip
+          unzip geode-sdk.zip -d geode-sdk
+          echo "GEODE_SDK=$PWD/geode-sdk" >> $GITHUB_ENV
+
       - name: Configure
         run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
       - name: Build
         run: cmake --build build --config Release
+
       - name: Upload macOS Binary
         uses: actions/upload-artifact@v4
         with:
@@ -39,10 +57,19 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download Geode SDK
+        run: |
+          curl -L https://github.com/geode-sdk/geode/releases/latest/download/geode-sdk.zip -o geode-sdk.zip
+          unzip geode-sdk.zip -d geode-sdk
+          echo "GEODE_SDK=$PWD/geode-sdk" >> $GITHUB_ENV
+
       - name: Configure iOS
         run: cmake -B build -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_BUILD_TYPE=Release
+
       - name: Build iOS
         run: cmake --build build --config Release
+
       - name: Upload iOS Geode
         uses: actions/upload-artifact@v4
         with:
@@ -53,12 +80,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download Geode SDK
+        run: |
+          curl -L https://github.com/geode-sdk/geode/releases/latest/download/geode-sdk.zip -o geode-sdk.zip
+          unzip geode-sdk.zip -d geode-sdk
+          echo "GEODE_SDK=$PWD/geode-sdk" >> $GITHUB_ENV
+
       - name: Install deps
         run: sudo apt-get update && sudo apt-get install -y cmake g++
+
       - name: Configure
         run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
       - name: Build
         run: cmake --build build --config Release
+
       - name: Upload Linux Binary
         uses: actions/upload-artifact@v4
         with:
@@ -69,14 +106,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download Geode SDK
+        run: |
+          curl -L https://github.com/geode-sdk/geode/releases/latest/download/geode-sdk.zip -o geode-sdk.zip
+          unzip geode-sdk.zip -d geode-sdk
+          echo "GEODE_SDK=$PWD/geode-sdk" >> $GITHUB_ENV
+
       - name: Install Android NDK
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r26d
+
       - name: Configure Android
         run: cmake -B build -DCMAKE_SYSTEM_NAME=Android -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a -DCMAKE_BUILD_TYPE=Release
+
       - name: Build Android
         run: cmake --build build --config Release
+
       - name: Upload Android Binary
         uses: actions/upload-artifact@v4
         with:
