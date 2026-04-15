@@ -1,167 +1,121 @@
-name: Release geode mod
+name: Build Universal Geode Mod
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - "v*"
 
 jobs:
-
-  # -------------------------
-  # macOS + iOS build
-  # -------------------------
-  apple:
-    runs-on: macos-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Install dependencies
-        run: |
-          brew install cmake ninja
-
-      - name: Download Geode SDK
-        run: |
-          git clone https://github.com/geode-sdk/geode.git --depth=1
-          echo "GEODE_SDK=$(pwd)/geode" >> $GITHUB_ENV
-
-      - name: Configure CMake
-        run: |
-          cmake -B build -G Ninja -DGEODE_SDK=$GEODE_SDK
-
-      - name: Build (macOS + iOS)
-        run: |
-          cmake --build build --config Release
-
-      - name: Package
-        run: |
-          cmake --build build --target package
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: geode-apple
-          path: build/*.geode
-
-
-  # -------------------------
-  # Windows build
-  # -------------------------
   windows:
     runs-on: windows-latest
-
     steps:
       - uses: actions/checkout@v3
-
-      - name: Install dependencies
-        run: choco install cmake ninja
-
-      - name: Download Geode SDK
-        run: |
-          git clone https://github.com/geode-sdk/geode.git --depth=1
-          echo "GEODE_SDK=$pwd\\geode" >> $env:GITHUB_ENV
-
-      - name: Configure CMake
-        run: |
-          cmake -B build -G Ninja -DGEODE_SDK=$env:GEODE_SDK
-
-      - name: Build (Windows)
-        run: |
-          cmake --build build --config Release
-
-      - name: Package
-        run: |
-          cmake --build build --target package
-
-      - name: Upload artifact
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build --config Release
+      - name: Upload Windows Binary
         uses: actions/upload-artifact@v3
         with:
-          name: geode-windows
-          path: build/*.geode
+          name: windows
+          path: build/maBot.dll
 
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build --config Release
+      - name: Upload macOS Binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: macos
+          path: build/maBot.dylib
 
-  # -------------------------
-  # Linux build
-  # -------------------------
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure iOS
+        run: cmake -B build -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_BUILD_TYPE=Release
+      - name: Build iOS
+        run: cmake --build build --config Release
+      - name: Upload iOS Geode
+        uses: actions/upload-artifact@v3
+        with:
+          name: ios
+          path: build/MahdiAhmedMC.maBot.geode
+
   linux:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
-
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y cmake ninja-build clang
-
-      - name: Download Geode SDK
-        run: |
-          git clone https://github.com/geode-sdk/geode.git --depth=1
-          echo "GEODE_SDK=$(pwd)/geode" >> $GITHUB_ENV
-
-      - name: Configure CMake
-        run: |
-          cmake -B build -G Ninja -DGEODE_SDK=$GEODE_SDK
-
-      - name: Build (Linux)
-        run: |
-          cmake --build build --config Release
-
-      - name: Package
-        run: |
-          cmake --build build --target package
-
-      - name: Upload artifact
+      - name: Install deps
+        run: sudo apt-get update && sudo apt-get install -y cmake g++
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build --config Release
+      - name: Upload Linux Binary
         uses: actions/upload-artifact@v3
         with:
-          name: geode-linux
-          path: build/*.geode
+          name: linux
+          path: build/maBot.so
 
-
-  # -------------------------
-  # Android build
-  # -------------------------
   android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r26d
+      - name: Configure Android
+        run: cmake -B build -DCMAKE_SYSTEM_NAME=Android -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a -DCMAKE_BUILD_TYPE=Release
+      - name: Build Android
+        run: cmake --build build --config Release
+      - name: Upload Android Binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: android
+          path: build/maBot.so
+
+  combine:
+    needs: [windows, macos, ios, linux, android]
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y cmake ninja-build unzip wget
-
-      - name: Install Android NDK
-        run: |
-          wget https://dl.google.com/android/repository/android-ndk-r26d-linux.zip
-          unzip android-ndk-r26d-linux.zip
-          echo "ANDROID_NDK=$(pwd)/android-ndk-r26d" >> $GITHUB_ENV
-
-      - name: Download Geode SDK
-        run: |
-          git clone https://github.com/geode-sdk/geode.git --depth=1
-          echo "GEODE_SDK=$(pwd)/geode" >> $GITHUB_ENV
-
-      - name: Configure CMake
-        run: |
-          cmake -B build -G Ninja \
-            -DGEODE_SDK=$GEODE_SDK \
-            -DANDROID_NDK=$ANDROID_NDK \
-            -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
-            -DANDROID_ABI=arm64-v8a \
-            -DANDROID_PLATFORM=android-24
-
-      - name: Build (Android)
-        run: |
-          cmake --build build --config Release
-
-      - name: Package
-        run: |
-          cmake --build build --target package
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
         with:
-          name: geode-android
-          path: build/*.geode
+          path: artifacts
+
+      - name: Extract iOS base .geode
+        run: |
+          mkdir universal
+          cd universal
+          unzip ../artifacts/ios/MahdiAhmedMC.maBot.geode
+
+      - name: Insert all binaries into root
+        run: |
+          cp artifacts/windows/maBot.dll universal/
+          cp artifacts/macos/maBot.dylib universal/
+          cp artifacts/linux/maBot.so universal/linux.so
+          cp artifacts/android/maBot.so universal/android.so
+
+      - name: Repack universal .geode
+        run: |
+          cd universal
+          zip -r ../MahdiAhmedMC.maBot.geode .
+
+      - name: Upload Universal Geode
+        uses: softprops/action-gh-release@v1
+        with:
+          files: MahdiAhmedMC.maBot.geode
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
