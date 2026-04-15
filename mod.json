@@ -10,7 +10,7 @@
     "id": "MahdiAhmedMC.maBot",
     "name": "maBot",
     "developer": "Mahdi",
-    "description": "Fork of xdBot",
+    "description": "maBot is a simple macro tool for geometry dash",
     "settings": {
         "button-setting": {
             "type": "custom:button",
