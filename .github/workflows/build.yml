@@ -87,13 +87,18 @@ jobs:
           input: builds
 
       - name: Repack .geode without folder
-        run: |
-         mkdir temp
-         unzip "${{ steps.combine.outputs.build-output }}" -d temp
-         inner=$(find temp -mindepth 1 -maxdepth 1 -type d)
-         mkdir final mv "$inner"/* final/
-         cd final
-         zip -r ../MahdiAhmedMC.maBot.geode .
+  run: |
+    mkdir temp
+    unzip "${{ steps.combine.outputs.build-output }}" -d temp
+
+    inner=$(find temp -mindepth 1 -maxdepth 1 -type d)
+
+    mkdir final
+    mv "$inner"/* final/
+
+    cd final
+    zip -r ../repacked.geode .
+
 
 
       - name: Rename final .geode
