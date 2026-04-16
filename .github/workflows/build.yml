@@ -63,21 +63,21 @@ jobs:
           path: builds
 
       - name: Rename artifact folders for combine
-   run: |
-    mv /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/Windows-build \
-       /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/geode-build-win || true
+        run: |
+          mv /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/Windows-build \
+             /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/geode-build-win || true
 
-    mv /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/macOS-build \
-       /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/geode-build-mac || true
+          mv /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/macOS-build \
+             /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/geode-build-mac || true
 
-    mv /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/Android32-build \
-       /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/geode-build-android32 || true
+          mv /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/Android32-build \
+             /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/geode-build-android32 || true
 
-    mv /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/Android64-build \
-       /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/geode-build-android64 || true
+          mv /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/Android64-build \
+             /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/geode-build-android64 || true
 
-    mv /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/iOS-build \
-       /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/geode-build-ios || true
+          mv /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/iOS-build \
+             /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/geode-build-ios || true
 
 
       - name: Combine builds
@@ -86,28 +86,27 @@ jobs:
         with:
           input: builds
 
+
       - name: Repack .geode without folder
-  run: |
-    mkdir temp
-    unzip "${{ steps.combine.outputs.build-output }}" -d temp
+        run: |
+          mkdir temp
+          unzip "${{ steps.combine.outputs.build-output }}" -d temp
 
-    inner=$(find temp -mindepth 1 -maxdepth 1 -type d)
+          inner=$(find temp -mindepth 1 -maxdepth 1 -type d)
 
-    mkdir final
-    mv "$inner"/* final/
+          mkdir final
+          mv "$inner"/* final/
 
-    cd final
-    zip -r ../repacked.geode .
-
+          cd final
+          zip -r ../repacked.geode .
 
 
       - name: Rename final .geode
-        run: |
-          mkdir final
-          cp "${{ steps.combine.outputs.build-output }}" "final/MahdiAhmedMC.maBot.geode"
+        run: mv repacked.geode MahdiAhmedMC.maBot.geode
+
 
       - name: Upload final .geode
         uses: actions/upload-artifact@v4
         with:
           name: Build Output
-          path: final/MahdiAhmedMC.maBot.geode
+          path: MahdiAhmedMC.maBot.geode
