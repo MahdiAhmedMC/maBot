@@ -62,13 +62,22 @@ jobs:
         with:
           path: builds
 
-      - name: Rename artifact folders to match combine script
-        run: |
-          mv builds/Windows-build builds/geode-build-win || true
-          mv builds/macOS-build builds/geode-build-mac || true
-          mv builds/Android32-build builds/geode-build-android32 || true
-          mv builds/Android64-build builds/geode-build-android64 || true
-          mv builds/iOS-build builds/geode-build-ios || true
+      - name: Rename artifact folders for combine
+   run: |
+    mv /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/Windows-build \
+       /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/geode-build-win || true
+
+    mv /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/macOS-build \
+       /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/geode-build-mac || true
+
+    mv /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/Android32-build \
+       /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/geode-build-android32 || true
+
+    mv /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/Android64-build \
+       /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/geode-build-android64 || true
+
+    mv /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/iOS-build \
+       /home/runner/work/_actions/geode-sdk/build-geode-mod/main/combine/artifacts/geode-build-ios || true
 
 
       - name: Combine builds
