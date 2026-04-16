@@ -48,7 +48,7 @@ jobs:
       - name: Upload platform build
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.config.name }}-build
+          name: geode-build-${{ matrix.config.name }}
           path: ${{ steps.build.outputs.build-output }}
 
   package:
