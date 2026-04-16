@@ -62,6 +62,15 @@ jobs:
         with:
           path: builds
 
+          - name: Rename artifact folders to match combine script
+  run: |
+    mv artifacts/Windows-build artifacts/geode-build-win || true
+    mv artifacts/macOS-build artifacts/geode-build-mac || true
+    mv artifacts/Android32-build artifacts/geode-build-android32 || true
+    mv artifacts/Android64-build artifacts/geode-build-android64 || true
+    mv artifacts/iOS-build artifacts/geode-build-ios || true
+
+
       - name: Combine builds
         uses: geode-sdk/build-geode-mod/combine@main
         id: combine
