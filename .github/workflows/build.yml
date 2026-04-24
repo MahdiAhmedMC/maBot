@@ -48,13 +48,13 @@ jobs:
       - name: Upload platform build
         uses: actions/upload-artifact@v4
         with:
-          name: geode-build-${{ matrix.config.name }}
+          name: ${{ matrix.config.name }}-build
           path: ${{ steps.build.outputs.build-output }}
 
   package:
     name: Package builds
     runs-on: ubuntu-latest
-    needs: ["build"]
+    needs: ['build']
 
     steps:
       - name: Download all platform builds
@@ -62,20 +62,32 @@ jobs:
         with:
           path: builds
 
+      - name: Rename artifact folders to match combine script
+        run: |
+          mv builds/Windows-build builds/geode-build-win || true
+          mv builds/macOS-build builds/geode-build-mac || true
+          mv builds/Android32-build builds/geode-build-android32 || true
+          mv builds/Android64-build builds/geode-build-android64 || true
+          mv builds/iOS-build builds/geode-build-ios || true
+
+      - name: Combine builds
+        uses: geode-sdk/build-geode-mod/combine@main
+        id: combine
+        with:
+          input: builds
+
       - name: Repack .geode without folder
         run: |
-         mkdir temp
-         unzip "${{ steps.combine.outputs.build-output }}" -d temp
-         inner=$(find temp -mindepth 1 -maxdepth 1 -type d)
-         mkdir final mv "$inner"/* final/
-         cd final
-         zip -r ../MahdiAhmedMC.maBot.geode .
-      - name: Rename final .geode
-        run: |
+          mkdir temp
+          unzip "${{ steps.combine.outputs.build-output }}" -d temp
+          inner=$(find temp -mindepth 1 -maxdepth 1 -type d)
           mkdir final
-          cp "${{ steps.combine.outputs.build-output }}" "final/MahdiAhmedMC.maBot.geode"
+          mv "$inner"/* final/
+          cd final
+          zip -r ../MahdiAhmedMC.maBot.geode .
+
       - name: Upload final .geode
         uses: actions/upload-artifact@v4
         with:
           name: Build Output
-          path: final/MahdiAhmedMC.maBot.geode
+          path: MahdiAhmedMC.maBot.geode
