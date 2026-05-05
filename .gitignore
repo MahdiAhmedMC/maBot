@@ -1,0 +1,11 @@
+build/
+.geode/
+cpm-cache/
+_deps/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.geode
+*.log
+*.swp
