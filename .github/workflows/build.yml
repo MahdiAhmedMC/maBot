@@ -47,7 +47,7 @@ jobs:
         with:
           sdk: "5.6.1"
           build-config: Release
-          combine: true
+          combine: false
           target: ${{ matrix.config.target }}
 
       - name: Upload platform build
