@@ -1,10 +1,10 @@
-name: Build Geode mod
+name: Build Geode Mod
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - "main"
+      - "**"
 
 jobs:
   build:
@@ -12,28 +12,23 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - name: Windows
-            os: windows-latest
-            artifact-name: geode-build-win
+        - name: Windows
+          os: windows-latest
 
-          - name: macOS
-            os: macos-latest
-            artifact-name: geode-build-mac
+        - name: macOS
+          os: macos-latest
 
-          - name: Android32
-            os: ubuntu-latest
-            target: Android32
-            artifact-name: geode-build-android32
+        - name: iOS
+          os: macos-latest
+          target: iOS
 
-          - name: Android64
-            os: ubuntu-latest
-            target: Android64
-            artifact-name: geode-build-android64
+        - name: Android32
+          os: ubuntu-latest
+          target: Android32
 
-          - name: iOS
-            os: macos-latest
-            target: iOS
-            artifact-name: geode-build-ios
+        - name: Android64
+          os: ubuntu-latest
+          target: Android64
 
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
@@ -42,19 +37,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build the mod
-        id: build
         uses: geode-sdk/build-geode-mod@main
         with:
-          sdk: "5.6.1"
-          build-config: Release
-          combine: false
+          combine: true
           target: ${{ matrix.config.target }}
-
-      - name: Upload platform build
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.config.artifact-name }}
-          path: ${{ steps.build.outputs.build-output }}
 
   package:
     name: Package builds
@@ -63,22 +49,9 @@ jobs:
 
     steps:
       - uses: geode-sdk/build-geode-mod/combine@main
-        id: combine
+        id: build
 
-      - name: Rename final .geode
-        run: |
-          mkdir -p final
-          if [ -f "${{ steps.combine.outputs.build-output }}" ]; then
-            cp "${{ steps.combine.outputs.build-output }}" "final/MahdiAhmedMC.maBot.geode"
-          elif [ -d "${{ steps.combine.outputs.build-output }}" ]; then
-            find "${{ steps.combine.outputs.build-output }}" -name "*.geode" -type f -exec cp {} "final/MahdiAhmedMC.maBot.geode" \;
-          else
-            echo "::error::Could not find build output at ${{ steps.combine.outputs.build-output }}"
-            exit 1
-          fi
-
-      - name: Upload final .geode
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: Build Output
-          path: final/MahdiAhmedMC.maBot.geode
+          path: ${{ steps.build.outputs.build-output }}
